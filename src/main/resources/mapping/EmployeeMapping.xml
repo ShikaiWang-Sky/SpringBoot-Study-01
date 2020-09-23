@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wang.dao.EmployeeMapping">
+
+    <select id="queryAllEmployeeList" resultMap="EmployeeWithDepartmentName">
+        select e.id as eid, lastName, email, gender, date, departmentName
+        from company.employee as e
+        inner join company.department as d
+        on did = d.id
+        order by eid asc;
+    </select>
+
+    <select id="queryEmployeeById" resultMap="EmployeeWithDepartmentName" parameterType="int">
+        select e.id as eid, lastName, email, gender, date, departmentName, did
+        from company.employee as e
+        inner join company.department as d
+        on did = d.id
+        where e.id = #{id};
+    </select>
+
+    <!--参数要写全! property为pojo属性名, column为上面sql中的字段名-->
+    <resultMap id="EmployeeWithDepartmentName" type="Employee">
+        <result property="id" column="eid"/>
+        <result property="lastName" column="lastName"/>
+        <result property="email" column="email"/>
+        <result property="gender" column="gender"/>
+        <result property="date" column="date"/>
+        <result property="did" column="did"/>
+        <association property="department" javaType="Department">
+            <result property="departmentName" column="departmentName"/>
+        </association>
+    </resultMap>
+
+    <insert id="addEmployee" parameterType="map">
+        insert into company.employee (lastName, email, gender, date, did)
+        VALUES (#{lastName}, #{email}, #{gender}, #{date}, #{did});
+    </insert>
+
+    <update id="updateEmployee" parameterType="map">
+        update company.employee
+        set lastName = #{lastName}, email = #{email}, gender = #{gender}, date = #{date}, did = #{did}
+        where id = #{id};
+    </update>
+
+    <delete id="deleteEmployee" parameterType="int">
+        delete from company.employee where id = #{id};
+    </delete>
+
+</mapper>
